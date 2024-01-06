@@ -1,0 +1,44 @@
+USE [pollAppDb]
+GO
+SET IDENTITY_INSERT [dbo].[Answers] ON 
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (1, 1, N'They are so cute!', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (2, 1, N'Cats rules the world!!!', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (3, 1, N'I am more a dog person.', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (4, 1, N'They are OK', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (5, 2, N'pop', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (6, 2, N'rap', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (7, 2, N'Metal', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (8, 2, N'rock', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (9, 3, N'pink', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (10, 3, N'purple', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (11, 3, N'orange', 0)
+GO
+
+INSERT [dbo].[Answers] ([AnswerID], [QuestionID], [Option], [Votes]) VALUES (12, 3, N'blue', 0)
+GO
+
+
+SET IDENTITY_INSERT [dbo].[Answers] OFF
+GO
