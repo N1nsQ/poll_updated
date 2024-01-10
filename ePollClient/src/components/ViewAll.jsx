@@ -5,7 +5,6 @@ import {
   CardContent,
   Icon,
   InputBase,
-  Link,
   List,
   ListItem,
   Paper,
@@ -13,12 +12,12 @@ import {
 } from "@mui/material";
 import StyledBox from "../Layouts/StyledBox";
 import { SearchTwoTone } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
-function AllPolls({ onQuestionClick, questionList, setQuestionList }) {
-  
+function ViewAll({ onQuestionClick, questionList, setQuestionList }) {
   const [searchKey, setSearchKey] = useState("");
-  const [searchList, setSearchList] = useState([]); 
-  
+  const [searchList, setSearchList] = useState([]);
+
   useEffect(() => {
     createAPIEndpoint(ENDPOINTS.question)
       .fetch()
@@ -71,7 +70,7 @@ function AllPolls({ onQuestionClick, questionList, setQuestionList }) {
                   key={index}
                   onClick={() => onQuestionClick(question.questionID)}
                 >
-                  <Link>{question.title}</Link>
+                  <Link style={{ color: 'lightBlue' }}>{question.title}</Link>
                 </ListItem>
               ))}
             </List>
@@ -82,4 +81,4 @@ function AllPolls({ onQuestionClick, questionList, setQuestionList }) {
   );
 }
 
-export default AllPolls;
+export default ViewAll;

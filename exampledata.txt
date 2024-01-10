@@ -42,3 +42,21 @@ GO
 
 SET IDENTITY_INSERT [dbo].[Answers] OFF
 GO
+
+
+USE [pollAppDb]
+GO
+SET IDENTITY_INSERT [dbo].[Questions] ON 
+GO
+
+INSERT [dbo].[Questions] ([QuestionID], [Title]) VALUES (1, N'What do you think about cats?')
+GO
+
+INSERT [dbo].[Questions] ([QuestionID], [Title]) VALUES (2, N'What is your favorite music genre?')
+GO
+
+INSERT [dbo].[Questions] ([QuestionID], [Title]) VALUES (3, N'What is your favorite color?')
+GO
+
+SET IDENTITY_INSERT [dbo].[Questions] OFF
+GO

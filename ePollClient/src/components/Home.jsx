@@ -1,16 +1,16 @@
-import { Link } from "react-router-dom";
-import Poll from "./Poll";
 import { useState, useEffect } from "react";
 import Create from "./Create";
-import { Container, Grid, Card, Typography } from "@mui/material";
-import AllPolls from "./AllPolls";
+import { Container, Grid, Card, Typography, Button } from "@mui/material";
+import ViewAll from "./ViewAll";
 import { createAPIEndpoint, ENDPOINTS } from "../api";
+import SinglePoll from "./SinglePoll";
+import { Link } from "react-router-dom";
 
 function Home() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [pollQuestions, setPollQuestions] = useState([]);
   const [questionId, setQuestionId] = useState(1);
-  const [questionList, setQuestionList] = useState([]); // sent to the AllPoll
+  const [questionList, setQuestionList] = useState([]);
 
   const addNewQuestion = (newQuestion) => {
     setQuestionList((prevQuestions) => [...prevQuestions, newQuestion]);
@@ -31,21 +31,13 @@ function Home() {
       .catch((error) => console.error("Error fetching questions:", error));
   }, []);
 
-  //console.log("Question:", pollQuestions)
-  //console.log("Selected: ", selectedQuestion)
-
   const updateQuestionList = (newQuestionList) => {
     setPollQuestions(newQuestionList);
   };
 
-  /*const updateQuestionId = (newId) => {
-    setQuestionId(newId);
-  };*/
-
   const handleQuestionClick = (question) => {
-    //console.log("Vastauksena saatiin", question)
+    console.log("Vastauksena saatiin", question);
     setQuestionId(question);
-    console.log("Hello", question);
   };
 
   return (
@@ -57,7 +49,7 @@ function Home() {
         <Grid container spacing={5} justify="center">
           <Grid item xs={12} md={4}>
             <Card>
-              <AllPolls
+              <ViewAll
                 onQuestionClick={handleQuestionClick}
                 questionList={questionList}
                 setQuestionList={setQuestionList}
@@ -66,17 +58,21 @@ function Home() {
           </Grid>
           <Grid item xs={12} md={8}>
             <Card>
-              <Poll 
+              <SinglePoll
                 questionId={questionId}
-                addNewPoll={updateQuestionList}   
-             />
+                addNewPoll={updateQuestionList}
+              />
             </Card>
             <div style={{ marginTop: 20 }}>
-              <Create 
+              <Create
                 addNewPoll={addNewQuestion}
                 updateQuestions={handleQuestionClick}
-                //updateQuestionId={updateQuestionId}
-                />
+              />
+              <Button variant="outlined" style={{ float: "right" }}>
+                <Link to="/polls" style={{ color: "lightBlue" }}>
+                  View Results
+                </Link>
+              </Button>
             </div>
           </Grid>
         </Grid>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   List,
   ListItemButton,
@@ -8,15 +7,13 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { createAPIEndpoint, ENDPOINTS } from "../api";
 import StyledBox from "../Layouts/StyledBox";
 
-const Poll = ({ questionId }) => {
+const SinglePoll = ({ questionId }) => {
   const [questionData, setQuestionData] = useState();
   const [answerData, setAnswerData] = useState([]);
 
-  // fetching questiondata ()
   useEffect(() => {
     createAPIEndpoint(ENDPOINTS.question)
       .fetchById(questionId)
@@ -24,10 +21,9 @@ const Poll = ({ questionId }) => {
         //console.log("Questiondata from backend:", response.data);
         setQuestionData(response.data);
       })
-      .catch((err) => console.log('Error fetching question:', err));
+      .catch((err) => console.log("Error fetching question:", err));
   }, [questionId]);
 
-  // fetching answerdata
   useEffect(() => {
     createAPIEndpoint(ENDPOINTS.answer)
       .fetch()
@@ -37,26 +33,6 @@ const Poll = ({ questionId }) => {
       })
       .catch((err) => console.log(err));
   }, []);
-
-  /*const nextQuestion = () => {
-    const id = questionData.questionID
-    console.log(id)
-    const length = Object.keys(questionData).length +1
-    console.log("Length", length)
-
-    if (id < length) {
-      setQuestionData((prevQuestionData) => ({
-        ...prevQuestionData,
-        questionID: prevQuestionData.questionID + 1,
-      }));
-    } else {
-      setQuestionData((prevQuestionData) => ({
-        ...prevQuestionData,
-        questionID: 1,
-      }));
-    }*/
-    
-  
 
   const handleVote = (questionId, answerId, currentVotes, currentOption) => {
     console.log("Question ID:", questionId);
@@ -79,7 +55,9 @@ const Poll = ({ questionId }) => {
         console.log("Vote updated successfully:", response.data);
         setAnswerData((prevAnswerData) => {
           const updatedData = prevAnswerData.map((answer) =>
-            answer.answerID === answerId ? { ...answer, votes: newVotes } : answer
+            answer.answerID === answerId
+              ? { ...answer, votes: newVotes }
+              : answer
           );
           return updatedData;
         });
@@ -88,8 +66,7 @@ const Poll = ({ questionId }) => {
         console.log("Update error:", err);
       });
 
-    setAnswerData(answerData)
-
+    setAnswerData(answerData);
   };
 
   return (
@@ -122,9 +99,9 @@ const Poll = ({ questionId }) => {
                     </ListItemButton>
                   ))}
               </List>
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-               
-              </div>
+              <div
+                style={{ display: "flex", justifyContent: "flex-end" }}
+              ></div>
             </StyledBox>
           </CardContent>
         </Card>
@@ -135,4 +112,4 @@ const Poll = ({ questionId }) => {
   );
 };
 
-export default Poll;
+export default SinglePoll;

@@ -1,47 +1,174 @@
-# ePoll 
+# ePoll application
 
-### Setup
+ePoll is the latest invention to gather up opinions from friends and alike. It's quite like https://www.polly.ai/ but much more simple way.
 
-To run this application, you need to create a local database. I have used SQL Server and my database is named as pollAppDb. Necessary tables are created by backend code. To connect to your local database, check that ConnectionString is correct. Connection string can be found in the appsettings.json file.
+A poll is created by posting the question and its answer options to the backend. Polls can be listed and fetched individually. A vote can be cast to single option of an event, the backend will not record the identity of the voter and will just count individual votes per option.
+
+The assignment instructions given in this document are general. In case you were provided alternate instructions for assignment with the message, in case of conflict those will overrule these instructions.
+
+***
+# Backend API
+
+Simple reference implementation of backend server is provided (see server.js).
+
+## Requirements 
+Requires Node.js installed with npm. 
+
+## Install
+To install required packages run
 ```
-ePollServer/appsettings.json
-
-"AllowedHosts": "*",
-"ConnectionStrings": {
-    "DevConnection": "Server=(local)\\SQLEXPRESS;Database=pollAppDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+npm install 
 ```
-This project uses NuGet packacges Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.SqlServer and Microsoft.EntityFrameworkCore.Tools. 
-Buid the project and after succesfull buil open Package Manager Console. Make sure the ePollServer project is selected and also make sure that your local server is running. You can make migrations by running commands
-```
-Add-Migration "initial create"
-Update-Database
-```
-You can now run the project in browser.  
 
-Next open the ClientSide project in code editor. Open file index.jsx that can be found inside api-folder.
+## Run
+To run the server run 
 ```
-ePollClient/src/api/index.jsx
+npm start
+```
+## List all existing polls
+Endpoint: /polls
 
-export const BASE_URL = 'http://localhost:5120/';
+### Request
+Method: GET
 
-export const ENDPOINTS = {
-    question: 'question',
-    answer: 'answer',
-    both: 'Question/createQuestionWithOptions'
+### Response
+Body:
+```
+{
+    "polls": [
+        {
+            "id": 1,
+            "title": "What is your favorite drink?"
+        },
+        {
+            "id": 2,
+            "title": "Is this a cool question?"
+        }
+    ]
 }
 ```
-The BASE_URL should be same as your server address in the project you just opened. Update the address if necessary. Notice that the answer should include only localhost and the port number.  
-Now you can run the application.
-```
-npm run dev
-```
-Open the server side project Program.cs file and make sure that there is rigth address:
-```
-ePollServer/Program.cs
+## Get a poll
+Endpoint: /polls/{id}
 
-app.UseCors(options =>
-options.WithOrigins("http://localhost:5173")
-.AllowAnyMethod()
-.AllowAnyHeader());
+### Request
+Method: GET
+Parameters: id
+
+### Response
+Body:
 ```
-Modify the useCors function to use your local address where the client side project opened. Now everything should be working.
+{
+    "id": 2,
+    "title": "Is this a cool question?",
+    "options": [
+        {
+            "id": 1,
+            "title": "Yes",
+            "votes": 0
+        },
+        {
+            "id": 2,
+            "title": "No",
+            "votes": 0
+        },
+        {
+            "id": 3,
+            "title": "Cool, another option",
+            "votes": 0
+        }
+    ]
+}
+```
+## Vote
+Endpoint: /polls/{id}/vote/{option}
+
+### Request
+Method: POST
+Parameters: id (id of the poll to vote in)
+            option (id of the option to vote for)
+
+### Response
+Body:
+```
+{
+    "id": 2,
+    "title": "Is this a cool question?",
+    "options": [
+        {
+            "id": 1,
+            "title": "Yes",
+            "votes": 0
+        },
+        {
+            "id": 2,
+            "title": "No",
+            "votes": 1
+        },
+        {
+            "id": 3,
+            "title": "Cool, another option",
+            "votes": 0
+        }
+    ]
+}
+```
+## Create new poll
+Endpoint: /polls/add
+
+### Request
+Method: POST
+Body:
+```
+{
+    "title": "Test qestion?",
+    "options":[
+   		"Option 1?",
+   		"Option 2?"
+   	]
+}
+```
+### Response
+```
+{
+    "id": 3,
+    "title": "Test qestion?",
+    "options": [
+        {
+            "id": 1,
+            "title": "Option 1?",
+            "votes": 0
+        },
+        {
+            "id": 2,
+            "title": "Option 2?",
+            "votes": 0
+        }
+    ]
+}
+```
+
+
+# Front-end assignment 
+Create a web application that allows users to:
+* List existing polls
+* View poll options and their current vote counts
+* Vote an option for a poll
+* Create a new poll with title and options
+
+The application must use backend server api that is described above (an example server implementation is provided).
+
+You can select the frameworks and components to use freely, a modern js application is preferred. The example server application can be used as a backend, but in case you know that you can write a better one you can do so (please follow the instructions and requirements for backend assignment).
+
+The deliverable should contain application sources and README file containing at least a guide how to build and run the application.
+
+# Backend assignment 
+Create a backend server application that provides REST API as described above. An example server implementation is provided, but the implementation is very basic and has several flaws. You should not repeat the flaws but follow the API declaration.
+
+The implementation must
+* Implement the described API
+* Persist all the polls and their voting data so that the data is available even after server restarts
+* Authentication or identification for the users is not required in any way. API is free to use by anonymous users.
+
+The deliverable should contain application sources and README file containing at least a guide how to set up and run the application. In case the persistent store requires some schema (linke in database) please include scripts to build that as well.
+
+
