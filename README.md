@@ -1,174 +1,202 @@
 # ePoll application
 
-ePoll is the latest invention to gather up opinions from friends and alike. It's quite like https://www.polly.ai/ but much more simple way.
+## Backend / Visual Studio 2022
 
-A poll is created by posting the question and its answer options to the backend. Polls can be listed and fetched individually. A vote can be cast to single option of an event, the backend will not record the identity of the voter and will just count individual votes per option.
+Asennetaan tarvittavat NuGet paketit: 
+* EntityFrameworkCore
+* EntityFrameworkCore.SqlServer
+* EntityFrameworkCore.Tools
 
-The assignment instructions given in this document are general. In case you were provided alternate instructions for assignment with the message, in case of conflict those will overrule these instructions.
 
-***
-# Backend API
+### Question.cs
 
-Simple reference implementation of backend server is provided (see server.js).
+```C#
+    public class Question
+    {
+        [Key]
+        public int QuestionID { get; set; }
 
-## Requirements 
-Requires Node.js installed with npm. 
+        [Column(TypeName = "nvarchar(250)")]
+        public string Title { get; set; }
 
-## Install
-To install required packages run
+        public List<Answer> Answers { get; set; }
+    
+    }
 ```
-npm install 
-```
 
-## Run
-To run the server run 
-```
-npm start
-```
-## List all existing polls
-Endpoint: /polls
+* Määritellään Question-taulu: Sillä on sarakkeet QuestionID, Title sekä kysymykseen liittyvät vastaukset ```List<Answer> Answers```
+* ```[Key]``` merkkaa pääavainta
+* Sting-tyypin arvo vaatii Column määrittelyn.
+* Lista vastauksista on viiteavain Answer-tauluun.
 
-### Request
-Method: GET
+#### { get; set; } selitettynä
 
-### Response
-Body:
-```
+* Syntaksi käyttää enkapsulointia
+* get-metodi palauttaa muuttujan arvon
+* set-metodilla asetetaan muuttujaan arvo
+* Kentät voidaan määrittelä read-only kentiksi käyttämällä vain get-metodia tai wite-only käyttämällä vain set-metodia
+  
+### Answer.cs
+
+```C#
+public class Answer
 {
-    "polls": [
-        {
-            "id": 1,
-            "title": "What is your favorite drink?"
-        },
-        {
-            "id": 2,
-            "title": "Is this a cool question?"
-        }
-    ]
-}
-```
-## Get a poll
-Endpoint: /polls/{id}
+    [Key]
+    public int AnswerID { get; set; }
 
-### Request
-Method: GET
-Parameters: id
+    public int QuestionID { get; set; }
 
-### Response
-Body:
-```
-{
-    "id": 2,
-    "title": "Is this a cool question?",
-    "options": [
-        {
-            "id": 1,
-            "title": "Yes",
-            "votes": 0
-        },
-        {
-            "id": 2,
-            "title": "No",
-            "votes": 0
-        },
-        {
-            "id": 3,
-            "title": "Cool, another option",
-            "votes": 0
-        }
-    ]
-}
-```
-## Vote
-Endpoint: /polls/{id}/vote/{option}
+    [Column(TypeName = "nvarchar(250)")]
+    public string Option { get; set; }
 
-### Request
-Method: POST
-Parameters: id (id of the poll to vote in)
-            option (id of the option to vote for)
+    public int Votes { get; set; }
 
-### Response
-Body:
-```
-{
-    "id": 2,
-    "title": "Is this a cool question?",
-    "options": [
-        {
-            "id": 1,
-            "title": "Yes",
-            "votes": 0
-        },
-        {
-            "id": 2,
-            "title": "No",
-            "votes": 1
-        },
-        {
-            "id": 3,
-            "title": "Cool, another option",
-            "votes": 0
-        }
-    ]
-}
-```
-## Create new poll
-Endpoint: /polls/add
-
-### Request
-Method: POST
-Body:
-```
-{
-    "title": "Test qestion?",
-    "options":[
-   		"Option 1?",
-   		"Option 2?"
-   	]
-}
-```
-### Response
-```
-{
-    "id": 3,
-    "title": "Test qestion?",
-    "options": [
-        {
-            "id": 1,
-            "title": "Option 1?",
-            "votes": 0
-        },
-        {
-            "id": 2,
-            "title": "Option 2?",
-            "votes": 0
-        }
-    ]
 }
 ```
 
+Answer-taulu kuvastaa vastausvaihtoehtoa, jota käyttäjä voi äänestää. Vastauksella on uniikki id AnswerID, QuestionID jolla se yhdisteään oikeaan kysymykseen, varsinainen vastaus tekstinä (Option) sekä annetut äänet (Votes)
 
-# Front-end assignment 
-Create a web application that allows users to:
-* List existing polls
-* View poll options and their current vote counts
-* Vote an option for a poll
-* Create a new poll with title and options
+### PollDbContext.cs
 
-The application must use backend server api that is described above (an example server implementation is provided).
+Tämä luokka määrittelee tietokantaobjektin ```PollDbContext``` joka laajentaa EntityFrameworkin luokkaa DbContext. Se toimii välikappaleena sovelluksen ja tietokannan välillä.
 
-You can select the frameworks and components to use freely, a modern js application is preferred. The example server application can be used as a backend, but in case you know that you can write a better one you can do so (please follow the instructions and requirements for backend assignment).
+```C#
+public class PollDbContext:DbContext
+{
+    public PollDbContext(DbContextOptions<PollDbContext> options) : base(options) { }
 
-The deliverable should contain application sources and README file containing at least a guide how to build and run the application.
+    public DbSet<Question> Questions { get; set; }
 
-# Backend assignment 
-Create a backend server application that provides REST API as described above. An example server implementation is provided, but the implementation is very basic and has several flaws. You should not repeat the flaws but follow the API declaration.
+    public DbSet<Answer> Answers { get; set; } 
+}
+```
 
-The implementation must
-* Implement the described API
-* Persist all the polls and their voting data so that the data is available even after server restarts
-* Authentication or identification for the users is not required in any way. API is free to use by anonymous users.
+Koodi avattuna:  
+* ```public class PollDbContext:DbContext``` PollDbContext perii luokan EntityFrameWotkin luokan DbContext
+* ```public PollDbContext(DbContextOptions<PollDbContext> options) : base(options) { }```
+  * Tässä määritellään luokan konstruktori ```public class PollDbContext()```
+  * Sillä on parametrinä ```DbContextOptions<PollDbContext>``` joka sisältää tietokannan asetukset.
+  * Nämä asetukset välitetään perittyyn konstruktoriin DbContext-luokan base kontruktoriin.
+  * DbContext tarvitsee konfiguraatioasetuksia tietokannan yhteyden määrittelemiseksi.
 
-The deliverable should contain application sources and README file containing at least a guide how to set up and run the application. In case the persistent store requires some schema (linke in database) please include scripts to build that as well.
+* Seuraavaksi määritellään tietokanta ja talulut jotka vastaavat ylempänä luotuja luokkia
+  * ```public DbSet<Question> Questions { get; set; }``` määrittää Question-taulun
+  * ```public DbSet<Answer> Answers { get; set; }``` määrittää Answer-taulun
+  * ```DbSet``` on EntityFrameworkin luokka, joka kukaa tietokantataulua ja mahdollistaa kyselyn muokkaamisen C#-objektina
 
 
+Seuraavaksi PollDbContext-instassi täytyy määritellä käyttöön ja se tehdään muokkaamalla Program.cs tiedostoa.
+
+
+### Program.cs
+
+Seuraavassa koodinpätkässä otetaan käyttöön yllä luotu PollDbContext
+```C#
+// dependency injection
+builder.Services.AddDbContext<PollDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+```
+* ```Services``` on ominaisuus, joka mahdollistaa palvelujen rekisteröimisen sovelluksen käyttöön.
+* ```AddDbContext<PollDbContext>``` Tämä metodi rekisteröi PollDbContext-luokan sovelluksen palveluihin
+* ```AddDbContext``` on osa EntityFrameworkia ja se helpottaa tietokantayhteyksien konfigurointia ja käyttöönottoa.
+* ```(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")))``` Tämä on lambda-funktio, joka määrittää tietokantayhteyden asetukset.
+  * ```builder.Configuration.GetConnectionString("DevConnection")``` Tässä haetaan Connection String joka on määritelty appsettings.json tiedostossa nimellä DevConnection
+
+Kun sovellus käynnistyy, Dependency Injection-järjestelmä automaattisesti injektoi ```PollDbContext```:n sovelluksen komponentteihin. ```PollDbContext``` on määritelty käyttämään SQL Server -tietokantaa.  
+
+#### CORS - Cross Origin Resource Sharing -asetukset  
+
+CORS on turvamekanismi, joka rajoittaa web-sivuston JavaScript-koodin pääsyn resursseihin eri verkkotunnuksilla tai eri porttinumerosta, missä sovellus itse pyörii. 
+
+```C#
+app.UseCors(options =>
+options.WithOrigins("http://localhost:5173")
+.AllowAnyMethod()
+.AllowAnyHeader());
+```
+* ```app.UseCors(options => ...);``` määrittää CORS-asetukset sovelluksen käyttöön.
+  * ```options => ...``` on lambda-funktio joka määrittelee CORS-säännöt
+* ```options.WithOrigins("http://localhost:5173")``` Määrittelee sallitun verkkotunnuksen/portin, josta voidaan tehdä cross-origin pyyntöjä palvelimelle
+* ```.AllowAnyMethod()``` määrittää sen, että sovellus hyväksyy kaikki HTTP- metodit: GET, POST, PUT, DELETE jne.
+* ```.AllowAnyHeader()``` määrittää sen, että kaikki HTTP-headerit ovat sallittuja. Headereita ovat esim. Content-Type, Authorization, jne.
+
+The whole Program.cs file: 
+```C#
+using ePollServer.Models;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<PollDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+var app = builder.Build();
+
+app.UseCors(options =>
+options.WithOrigins("http://localhost:5173")
+.AllowAnyMethod()
+.AllowAnyHeader());
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+```
+
+### appsettings.json
+
+Appsettings.json -tiedostoon lisätään connection-string, jonka avulla luodaan yhteys tietokantaan.
+
+```C#
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+    "AllowedHosts": "*",
+    "ConnectionStrings": {
+        "DevConnection": "Server=(local)\\SQLEXPRESS;Database=pollAppDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+    }
+}
+
+```
+
+### API Controllers
+
+Luodaan kontrollerit: 
+1. Solution Explorer ikkunassa on projektin tiedostot. Etsi sieltä kansio nimeltä Controllers
+2. Klikkaa hiiren oikeaa näppäinta kansion päällä ja valitse Add --> Controller...
+3. Vasemman puoleisesta valikosta valitaan API
+4. Keskelle avautuvasta ikkunasta valitaan API Controller with actions using Entity Framework
+5. Valitse Model class sen mukaan, mille luokalle kontrolleria ollaan tekemässä. (Tässä projektissa kontrollerit tehdään luokille Question ja Answer)
+6. DbContextClass:iin määritellään aikaisemmin luotu luokka, tässä PollDbContext
+7. Annetaan lopuksi kontrollerille kuvaava nimi
+
+Toistetaan tämä kahteen kertaan ja luodaan kontollerit Question Modelille (QuestionController.cs) ja Answer Modelille (AnswerController.cs).  
+
+Mikäli kontrollien luomisessa tulee error viesti liittyen CodeGenerationiin, tarkista NuGet-paketeista että Microsoft.VisualStudio.Web.CodeGeneration.Design -paketti on asennettu. Mikäli se on asennettu ja error-viesti tulee silti, poista asennus ja asenna paketti uudelleen.
+
+Kontrollereissa voidaan nyt nähdä parametri PollDbContext
+
+### QuestionController.cs
+
+Kontrollerin sisällä 
+
+### AnswerController.cs
