@@ -4,9 +4,22 @@
 
 Asennetaan tarvittavat NuGet paketit: 
 * EntityFrameworkCore
-* EntityFrameworkCore.SqlServer
-* EntityFrameworkCore.Tools
-
+  * Mahdollistaa työskentelyn tietokantojen parissa hyödyntäen objekteja
+  * Tietokantaan liittyvät toiminnot (kuten yhteyksien avaaminen, dataSetin luominen, tiedon lisääminen/muuttaminen jne) on automatisoitu --> Vähemmän virheitä koodissa
+  * Mahdollistaa abstraktimman työskentelyn
+  * Vähentää tarvetta data-access -koodille
+* EntityFrameworkCore.SqlServer - Käytetään projektissa SQL Server tietokantaa
+* EntityFrameworkCore.Tools ottaa käyttöön yleisimmät komennot:
+  * Add-Migration
+  * Bundle-Migration
+  * Drip-Database
+  * Get-DbContext
+  * Get-Migration
+  * Optimize-DbContext
+  * Remove-Migration
+  * Scaffold-DbContext
+  * Script-Migration
+  * Update-Database  
 
 ### Question.cs
 
@@ -58,7 +71,7 @@ Answer-taulu kuvastaa vastausvaihtoehtoa, jota käyttäjä voi äänestää. Vas
 
 ### PollDbContext.cs
 
-Tämä luokka määrittelee tietokantaobjektin ```PollDbContext``` joka laajentaa EntityFrameworkin luokkaa DbContext. Se toimii välikappaleena sovelluksen ja tietokannan välillä.
+Tämä luokka määrittelee tietokantaobjektin ```PollDbContext```. Onjekti perii EntityFrameworkin luokan DbContext laajentaen sitä. ```PollDbContext``` toimii välikappaleena sovelluksen ja tietokannan välillä.
 
 ```C#
 public class PollDbContext:DbContext
@@ -72,7 +85,7 @@ public class PollDbContext:DbContext
 ```
 
 Koodi avattuna:  
-* ```public class PollDbContext:DbContext``` PollDbContext perii luokan EntityFrameWotkin luokan DbContext
+* ```public class PollDbContext:DbContext``` PollDbContext perii luokan EntityFrameWorkin luokan DbContext
 * ```public PollDbContext(DbContextOptions<PollDbContext> options) : base(options) { }```
   * Tässä määritellään luokan konstruktori ```public class PollDbContext()```
   * Sillä on parametrinä ```DbContextOptions<PollDbContext>``` joka sisältää tietokannan asetukset.
