@@ -1,6 +1,6 @@
 # ePoll application
 
-## Backend / Visual Studio 2022
+## Backend / C#
 
 Asennetaan tarvittavat NuGet paketit: 
 * EntityFrameworkCore
@@ -210,6 +210,67 @@ Kontrollereissa voidaan nyt nähdä parametri PollDbContext
 
 ### QuestionController.cs
 
-Kontrollerin sisällä 
+#### Haetaan kysymys ja siihen liittyvät vastaukset
+
+```C#
+   // GET: api/Question
+   [HttpGet]
+   public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
+   {
+       return await _context.Questions
+           .Include(q => q.Answers)
+           .ToListAsync();
+   }
+```
+ * ```public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()``` on toiminnon määriteltmä.Toiminto on nimeltään GetQuestions ja se palauttaa ```Task<ActionResult<IEnumerable<Question>>>```
+* Return-lausele suorittaa tietokantakyselyn hakeakeen kaikki kysymykset tietokannasta
+  * _context-muuttuja on luokan sisällä injektoitu tietokantaolio
+  * ```Include(q => q.Answers)``` ilmaisee, että myös kysymyksiin liittyvät vastaukset (Answers) tulisi ladata samalla kyselyllä (JOIN)
+  * ```ToListAsync()``` palauttaa listan kysymyksistä ja niihin liittyvistä vastauksista
+* Yhteenvetona, yllä oleva koodi toimii siten, että se vastaa HTTP GET -pyyntöihin hakemalla kaikki kysymykset tietokannasta ja palauttaa ne vastauksena. Kysymykset sisältävät myös niihin liittyvät vastaukset.
+
+#### Uuden pollin luominen ja lähettäminen palvelimelle
+
+```C#
+[HttpPost("createQuestionWithOptions")]
+public ActionResult CreateQuestionWithOptions([FromBody] QuestionsWithOptionsViewModel request)
+{
+    if (request == null || string.IsNullOrEmpty(request.Title) || request.Options == null || request.Options.Count == 0)
+    {
+        return BadRequest("Invalid request. Title and options are required.");
+    }
+
+    var newQuestion = new Question
+    {
+        Title = request.Title
+        
+    };
+
+    _context.Questions.Add(newQuestion);
+    _context.SaveChanges();
+
+    
+    var newQuestionID = newQuestion.QuestionID;
+    foreach (var option in request.Options)
+    {
+        var newAnswer = new Answer
+        {
+            QuestionID = newQuestionID,
+            Option = option,
+            Votes = 0
+            
+        };
+        _context.Answers.Add(newAnswer);
+    }
+
+    _context.SaveChanges();
+
+    return Ok("Question with options created successfully.");
+}
+```
+
+
 
 ### AnswerController.cs
+
+Tätä ei (muistaakseni?) tarvinut muokata ollenkaan.
