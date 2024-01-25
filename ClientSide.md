@@ -56,6 +56,8 @@ useEffect(() => {
 
 # Muutamia Huomioita
 
+#### props.child
+
 ```javascript
 export default function Center(props) {
   return (
@@ -74,3 +76,16 @@ export default function Center(props) {
 }
 ```
 Tässä erityisesti kiinnitä huomiota ```{props.children}``` riviin! Center ottaa propseina vastaan kaiken sisällön, toimien wrapper-tagina vähän niinkuin Card tai Box. props.children on erityispropsi joka tarkoittaa sitä että kaikki kääritty sisältä tulee propseina. Komponentti keskittää sisällön nimensä mukaisesti. Propseina tuleva sisältö menee siis koodissa ```props.children``` rivin paikalle.
+
+#### Validation function
+
+```javascript
+    const validate = () => {
+        let temp = {}
+        temp.email = (/\S+@\S+\.\S+/).test(values.email) ? "" : "Email is not valid."
+        temp.name = values.name!= "" ? "" : "Name is required."
+        setErrors(temp)
+        return Object.values(temp).every(x => x == "")
+    }
+```
+Tämän funktion toimintaperiaate on se, että viimeisellä rivillä tarkistetaan onko temp-onjektin kaikki arvot tyhjiä. Jos on on, funktio palauttaa arvon***true** ja jos ei, funktio palauttaa arvon **false**
