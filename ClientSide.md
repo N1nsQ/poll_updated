@@ -53,3 +53,24 @@ useEffect(() => {
 ```
 * Haetaan data palvelimelta get-metodilla
 * 
+
+# Muutamia Huomioita
+
+```javascript
+export default function Center(props) {
+  return (
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{ minHeight:'100vh'}}
+    >
+      <Grid item xs={1}>
+        {props.children}
+      </Grid>
+    </Grid>
+  );
+}
+```
+Tässä erityisesti kiinnitä huomiota ```{props.children}``` riviin! Center ottaa propseina vastaan kaiken sisällön, toimien wrapper-tagina vähän niinkuin Card tai Box. props.children on erityispropsi joka tarkoittaa sitä että kaikki kääritty sisältä tulee propseina. Komponentti keskittää sisällön nimensä mukaisesti. Propseina tuleva sisältö menee siis koodissa ```props.children``` rivin paikalle.
